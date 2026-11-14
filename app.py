@@ -19,7 +19,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/state":
             return self.reply(trip.snapshot())
-        pages = {"/": ("index.html", "text/html"), "/report": ("report_draft.html", "text/html"),
+        pages = {"/README.md": ("README.md", "text/plain"), "/": ("index.html", "text/html"), "/report": ("report_draft.html", "text/html"),
                  "/architecture.svg": ("architecture.svg", "image/svg+xml")}
         evidence = {"01-preview.jpg", "02-saved.jpg", "03-draft.jpg",
                     "04-revised.jpg", "05-failed.jpg", "06-recovered.jpg"}
