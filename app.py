@@ -21,6 +21,11 @@ class Handler(BaseHTTPRequestHandler):
             return self.reply(trip.snapshot())
         pages = {"/": ("index.html", "text/html"), "/report": ("report_draft.html", "text/html"),
                  "/architecture.svg": ("architecture.svg", "image/svg+xml")}
+        evidence = {"01-preview.jpg", "02-saved.jpg", "03-draft.jpg",
+                    "04-revised.jpg", "05-failed.jpg", "06-recovered.jpg"}
+        name = self.path.removeprefix("/evidence/")
+        if self.path.startswith("/evidence/") and name in evidence:
+            return self.reply((ROOT / "evidence" / name).read_bytes(), kind="image/jpeg")
         if self.path in pages:
             name, kind = pages[self.path]
             return self.reply((ROOT / name).read_bytes(), kind=kind+"; charset=utf-8")

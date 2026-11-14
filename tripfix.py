@@ -62,11 +62,22 @@ class TripFix:
         plan = {"transport": f"{chosen['id']} · London → Lisbon · {chosen['departure']}",
                 "arrival": chosen["arrival"], "hotel": self.plan["hotel"],
                 "activity": "River walk · day 2, 16:00", "extra_cost": chosen["price"]}
+        changes = [{"field": k, "before": self.plan[k], "after": v}
+                   for k, v in plan.items() if self.plan[k] != v]
+        if not changes:
+            self.pending = None
+            self.message = "Your current plan already matches this repair. No changes to confirm."
+            self.log("Review repair", "No changes needed")
+            return self.snapshot()
+        reason = (f"This option reaches your hotel at {chosen['arrival']} "
+                  f"within your {self.constraints['latest_arrival']} limit.")
+        if plan["activity"] != self.plan["activity"]:
+            reason += " The later arrival misses the first-day walk; move it to day 2."
+        else:
+            reason += " Your hotel and day-2 walk stay unchanged."
         self.pending = {"id": uuid4().hex, "revision": self.revision, "plan": plan,
                         "source": f"Scenario fare list · revision {self.revision}",
-                        "reason": "The later arrival misses the first-day walk. Move the walk to day 2 and keep the existing hotel.",
-                        "changes": [{"field": k, "before": self.plan[k], "after": v}
-                                    for k, v in plan.items() if self.plan[k] != v]}
+                        "reason": reason, "changes": changes}
         self.message = "Review the affected parts. Your current plan stays in place until you confirm."
         self.log("Review repair", f"{chosen['id']} proposed; hotel preserved")
         return self.snapshot()
@@ -89,7 +100,10 @@ class TripFix:
         self.plan = deepcopy(p["plan"])
         self.pending = None
         self.revision += 1
-        self.message = f"Repair saved to your local plan: {self.plan['transport']}. Hotel kept; walk moved to day 2."
+        labels = {"transport": "flight", "arrival": "hotel arrival",
+                  "hotel": "hotel", "activity": "activity", "extra_cost": "extra cost"}
+        changed = ", ".join(labels[item["field"]] for item in p["changes"])
+        self.message = f"Local plan updated: {changed}. Riverside Hotel kept."
         self.log("Confirm repair", "Local plan updated")
         return self.snapshot()
 
@@ -104,16 +118,20 @@ class TripFix:
             self.plan = self.history.pop()
             self.revision += 1
             self.pending = None
-            self.message = "Previous local plan restored. The current requirements and latest fares are kept."
+            self.message = "Previous local plan restored. Review it against your current requirements and latest fares."
             self.log("Undo", "Previous local plan restored")
         return self.snapshot()
 
     def event(self, name):
         if name == "fare":
+            old_price = self.quotes[0]["price"]
+            if old_price == 145:
+                self.message = "The TF218 fare is still £145. No new price change; the current state is unchanged."
+                return self.snapshot()
             self.quotes[0]["price"] = 145
             self.revision += 1
             self.pending = None
-            self.message = "The TF218 fare changed from £120 to £145. Review a fresh repair before confirming."
+            self.message = f"The TF218 fare changed from £{old_price} to £145. Review a fresh repair before confirming."
             self.log("Fare update", "TF218 now £145; earlier preview expired")
         elif name == "failure":
             self.fail_next = True

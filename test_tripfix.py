@@ -85,5 +85,46 @@ class InteractionChecks(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.t.confirm("anything", False)
 
+    def test_repair_without_changes_has_no_confirmation(self):
+        p = self.t.propose()["pending"]
+        self.t.confirm(p["id"], True)
+        result = self.t.propose()
+        self.assertIsNone(result["pending"])
+        self.assertIn("No changes to confirm", result["message"])
+        self.assertEqual(1, len(self.t.history))
+
+    def test_repeated_fare_event_preserves_current_preview(self):
+        self.t.event("fare")
+        pending = self.t.propose()["pending"]
+        revision = self.t.revision
+        result = self.t.event("fare")
+        self.assertEqual(revision, result["revision"])
+        self.assertEqual(pending["id"], result["pending"]["id"])
+        self.assertIn("No new price change", result["message"])
+
+    def test_repair_after_confirmation_failure_retry_and_undo(self):
+        first = self.t.propose()["pending"]
+        self.t.confirm(first["id"], True)
+        saved = self.t.snapshot()["plan"]
+        self.t.update_constraints(180, "19:00")
+        second = self.t.propose()["pending"]
+        self.assertIn("TF204", second["plan"]["transport"])
+        self.assertEqual(170, second["plan"]["extra_cost"])
+        self.assertEqual("18:55", second["plan"]["arrival"])
+        self.assertEqual(saved["activity"], second["plan"]["activity"])
+        self.assertEqual({"transport", "arrival", "extra_cost"},
+                         {c["field"] for c in second["changes"]})
+        self.t.event("failure")
+        failed = self.t.confirm(second["id"], True)
+        self.assertEqual(saved, failed["plan"])
+        retry = self.t.propose()["pending"]
+        success = self.t.confirm(retry["id"], True)
+        self.assertNotIn("activity", success["message"])
+        self.assertEqual(170, success["plan"]["extra_cost"])
+        restored = self.t.undo()
+        self.assertEqual(saved, restored["plan"])
+        self.assertEqual("19:00", restored["constraints"]["latest_arrival"])
+        self.assertIn("Review it against", restored["message"])
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
