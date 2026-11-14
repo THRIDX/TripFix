@@ -1,6 +1,6 @@
 # TripFix
 
-Prose word count: 345
+Prose word count: 436
 
 ## Status and scope
 
@@ -23,13 +23,16 @@ Replay: review and confirm the £120 repair; change arrival to 19:00; apply requ
 
 ## Development record
 
-- Initial implementation: `fecee96`; state, preview, revision checks, undo and nine tests. These were delivered together.
-- Audit revision: `578956d`; unapplied input now blocks review and confirmation, identical repairs produce no preview, and repeated fare events preserve state. Outcome messages describe actual changed fields. These corrections address mismatches between displayed information and effective state.
+- A1 foundation: [5cc5c54](https://github.com/THRIDX/TripFix/commit/5cc5c54); the October concept and reference list are retained in [docs/design-concept.md](docs/design-concept.md) and [docs/references.md](docs/references.md).
+- Scope decision: the original multi-service, model-backed concept was narrowed to two simulated flights, editable limits and local confirmation/recovery. Python standard-library code and plain HTML/JavaScript make these interactions repeatable without accounts or external dependencies.
+- Initial implementation: [fecee96](https://github.com/THRIDX/TripFix/commit/fecee96); state, preview, revision checks, undo and nine tests. These were delivered together.
+- Audit revision: [578956d](https://github.com/THRIDX/TripFix/commit/578956d); unapplied input now blocks review and confirmation, identical repairs produce no preview, and repeated fare events preserve state. Outcome messages describe actual changed fields. These corrections address mismatches between displayed information and effective state.
+- Report and screenshots: [4050dee](https://github.com/THRIDX/TripFix/commit/4050dee); updated the rationale, architecture and six-screen sequence after the audit.
 - Verification: twelve executable tests pass, including empty repair, repeated fare and a second repair after confirmation with failure, retry and undo. Chrome checks confirmed disabled confirmation after an unapplied budget edit and the continuous sequence. No browser errors were reported.
 
 ## Contributions, reused material and AI assistance
 
-The scenario and interaction priorities follow the TripFix proposal in A1. Course concepts and research are credited in the report. OpenAI Codex assisted with implementation, tests, report wording and the system diagram. Review of its initial output exposed the three interaction inconsistencies above; the corrected behaviour was checked through executable tests and Chrome walkthroughs. The six screenshots were captured from the running application.
+The scenario and interaction priorities follow the TripFix proposal in A1. Earlier A1 work and repository preparation used Claude Code, as recorded in the [original README](https://github.com/THRIDX/TripFix/blob/5cc5c54/README.md). Course concepts and research are credited in the report. OpenAI Codex assisted with implementation, tests, report wording and the system diagram. Review of its initial output exposed the three interaction inconsistencies above; the corrected behaviour was checked through executable tests and Chrome walkthroughs. The six screenshots were captured from the running application.
 
 ## Files and review version
 
@@ -37,6 +40,6 @@ The scenario and interaction priorities follow the TripFix proposal in A1. Cours
 - `architecture.svg`: logical components and implementation boundaries.
 - `evidence/01-preview.jpg` through `06-recovered.jpg`: successive screens.
 - `evidence/test-results.txt`: executable test results.
-- Local review tag: `a2-review-2`. Public repository publication and Canvas submission remain pending.
+- Public repository: [THRIDX/TripFix](https://github.com/THRIDX/TripFix). GitHub review version: [a2-github-review-1](https://github.com/THRIDX/TripFix/tree/a2-github-review-1). The earlier local review tag `a2-review-2` is retained. Canvas submission remains pending.
 
 No separate ZIP, API key or video is needed to inspect this version.
