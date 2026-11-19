@@ -25,27 +25,27 @@ Assignment 1 brought together two bodies of evidence. TripTide found that langua
 
 The distinction between reviewing preferences and approving actions emerged during development. An earlier prototype already offered a preview and undo. A preview can show that dinner moved, but it leaves the traveller to guess whether the cause was a timetable constraint or an old assumption that dinner was flexible. In this version the traveller can inspect that assumption before reviewing the proposed change. They can leave a useful budget in place while correcting only the assumption that caused the problem.
 
-## 2. Storyboards and illustrated interaction
+## 2. Architecture and technical rationale
 
-**Keeping the whole opera.** After the 11:50 cancellation, the traveller moves Opera above Spend less. TripFix offers the 18:00 performance for £12 extra and shows that the sunset walk would be skipped. Seeing both consequences lets the traveller decide whether a full performance is worth that sacrifice.
-
-![Figure 1. Opera first: the £12 proposal and its effect on the walk.](../evidence/tripfix-storyboard-01-opera.jpg)
-
-**Changing the terms.** The traveller locks the full opera and zero extra spending. TripFix reports a conflict and disables confirmation. The traveller then unlocks Opera while keeping the spending lock. Interval admission at 15:45 becomes feasible for £0, and confirmation becomes available again. Only one requirement had to change.
-
-![Figure 2a. Two incompatible locks stop confirmation.](../evidence/tripfix-storyboard-02-conflict.jpg)
-
-![Figure 2b. Releasing the opera lock restores a £0 option.](../evidence/tripfix-storyboard-03-recovery.jpg)
-
-## 3. Architecture and technical rationale
-
-![Figure 3. TripFix components, control flow and simulation boundary.](../evidence/tripfix-system-architecture.png)
+![Figure 1. TripFix components, control flow and simulation boundary.](../evidence/tripfix-system-architecture.png)
 
 The local planner searches combinations of train services and activity slots. Arrival times, transfer gaps, budget and locks determine feasibility. Among feasible schedules it compares outcomes in the traveller’s stated order. This gives a block a precise meaning: moving it above another changes which outcome wins when both cannot be protected. A deterministic planner makes that decision reproducible with the same scenario and inputs. It also lets a reviewer inspect how one correction changes the proposal without supplying a model credential.
 
 The browser saves order, locks and enabled memories for each trip. A proposed repair remains separate from the confirmed itinerary. Withdrawing an eligible suggestion excludes that option before recalculation, so the next proposal respects the correction. Confirmation updates the itinerary held in the current session and supplies the reference plan for subsequent changes.
 
 We narrowed A1’s broader question about successive disruptions to repeated decisions after one cancellation. Keeping the event and inventory fixed lets the walkthrough isolate the effect of the traveller’s intervention. The screens record actual interface states. The cancellation, fares, past-trip examples and external booking or messaging effects are simulated. The next evaluation would ask travellers to predict the cost and identify the lost activity before confirming. That would test whether people understand the trade-off the planner has computed.
+
+## 3. Storyboards and illustrated interaction
+
+**Keeping the whole opera.** After the 11:50 cancellation, the traveller moves Opera above Spend less. TripFix offers the 18:00 performance for £12 extra and shows that the sunset walk would be skipped. Seeing both consequences lets the traveller decide whether a full performance is worth that sacrifice.
+
+![Figure 2. Opera first: the £12 proposal and its effect on the walk.](../evidence/tripfix-storyboard-01-opera.jpg)
+
+**Changing the terms.** The traveller locks the full opera and zero extra spending. TripFix reports a conflict and disables confirmation. The traveller then unlocks Opera while keeping the spending lock. Interval admission at 15:45 becomes feasible for £0, and confirmation becomes available again. Only one requirement had to change.
+
+![Figure 3a. Two incompatible locks stop confirmation.](../evidence/tripfix-storyboard-02-conflict.jpg)
+
+![Figure 3b. Releasing the opera lock restores a £0 option.](../evidence/tripfix-storyboard-03-recovery.jpg)
 
 ## References and project evidence
 
