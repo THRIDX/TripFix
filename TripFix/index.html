@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TripFix</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app" id="app">
+  <header class="hd">
+    <span class="logo"><i class="g"></i>TripFix</span>
+    <button class="lang" id="lang" type="button"></button>
+  </header>
+
+  <section class="top" aria-labelledby="trips">
+    <div class="titlerow">
+      <div class="trow">
+        <div class="route-picker" id="route-picker">
+          <h1><button class="route-button" id="trips" type="button" aria-expanded="false" aria-controls="trip-menu"><span class="sn">1</span><span id="route-label"></span><i aria-hidden="true"></i></button></h1>
+          <div class="trip-menu" id="trip-menu" hidden></div>
+        </div>
+        <button class="tedit" id="edit-trip" type="button"></button><span class="kick" id="kick"></span>
+      </div>
+      <div class="notice-row">
+        <div class="ev hit g" id="ev" hidden><span class="event-message" id="event-message" role="status"></span><span class="demo-clock" id="demo-clock" role="timer" hidden></span></div>
+        <button id="replay" class="replay" type="button"></button>
+      </div>
+    </div>
+    <div class="route-scroll"><div class="route" id="rt"></div></div>
+  </section>
+
+  <section class="flow">
+    <article class="frame f1" id="f1" aria-labelledby="h-rank">
+      <header class="step-h"><span class="sn">2</span><h2 id="h-rank"></h2><span class="st" id="st1"></span><button class="add g" id="add" type="button"></button></header>
+      <div class="stackwrap" id="stackwrap">
+        <div class="axis" aria-hidden="true"><b id="ax-hi"></b><i></i><span id="ax-name"></span><i></i><b id="ax-lo"></b></div>
+        <ol class="bars" id="bars" aria-labelledby="h-rank"></ol>
+      </div>
+      <div class="empty-trip" id="empty" hidden></div>
+      <footer class="f1-foot"><button class="edit-undo" id="edit-undo" type="button" disabled></button><button class="edit-undo" id="restore-money" type="button" hidden></button><div class="guess" id="guess"></div><button class="next-stage" id="rank-done" type="button" hidden></button></footer>
+      <div class="trash" id="trash"></div>
+    </article>
+
+    <svg class="arrow" id="a12" viewBox="0 0 44 20" aria-hidden="true"><path class="ln" d="M2 10H36"/><path class="tip" d="M31 4l7 6-7 6"/></svg>
+
+    <article class="frame f2" id="f2" aria-labelledby="h-think">
+      <header class="step-h"><span class="sn">3</span><h2 id="h-think"></h2></header>
+      <div class="thinking" id="thinking" hidden><span role="status" id="thinking-label"></span><progress id="think-progress"></progress></div>
+      <h3 class="sub" id="h-req"></h3>
+      <ul class="reqs" id="reqs"></ul>
+      <h3 class="sub" id="h-mem"></h3>
+      <div class="mems" id="mems"></div>
+      <footer class="review-foot" id="review-foot" hidden><button class="next-stage" id="review-done" type="button"></button></footer>
+    </article>
+
+    <svg class="arrow" id="a23" viewBox="0 0 44 20" aria-hidden="true"><path class="ln" d="M2 10H36"/><path class="tip" d="M31 4l7 6-7 6"/></svg>
+
+    <article class="frame f3" id="f3" aria-labelledby="h-book">
+      <header class="step-h"><span class="sn">4</span><h2 id="h-book"></h2></header>
+      <ul class="acts" id="acts"></ul>
+      <footer class="bookfoot"><b class="total" id="total"></b><button class="go g" id="go" type="button"></button></footer>
+    </article>
+  </section>
+</div>
+
+<dialog class="dlg" id="dlg" aria-labelledby="d-h">
+  <form id="dform" method="dialog" novalidate>
+    <header class="step-h"><span class="sn dot-c" id="d-sn"></span><h2 id="d-h"></h2><button class="x" type="button" id="d-x"></button></header>
+    <label class="fld"><span id="l-name"></span><input id="d-name" maxlength="14" autocomplete="off"></label>
+    <label class="fld"><span id="l-place"></span><input id="d-place" maxlength="20" autocomplete="off"></label>
+    <div class="two"><label class="fld"><span id="l-s"></span><input type="time" id="d-s" step="300"></label><label class="fld"><span id="l-e"></span><input type="time" id="d-e" step="300"></label></div>
+    <div class="fld"><span id="l-flex"></span><div class="segc" id="d-flex"></div></div>
+    <div class="fld"><span id="l-kind"></span><div class="segc" id="d-kind"></div></div>
+    <div class="fld"><span id="l-icon"></span><div class="icons" id="d-icon"></div></div>
+    <p class="warn" id="d-warn" role="alert"></p>
+    <footer class="dfoot"><button class="del" type="button" id="d-del"></button><button class="go g" type="submit" id="d-save"></button></footer>
+  </form>
+</dialog>
+
+<dialog class="dlg" id="money-dialog" aria-labelledby="money-name">
+  <header class="step-h"><h2 id="money-name"></h2><button class="x" id="money-close" type="button"></button></header>
+  <form id="money-form"><label class="fld"><span id="money-budget-label"></span><input id="money-budget" type="number" min="0" max="10000" step="0.01"></label><footer class="dfoot"><button class="del" id="money-delete" type="button"></button><button class="go g" type="submit" id="money-save"></button></footer></form>
+</dialog>
+
+<dialog class="dlg" id="tdlg" aria-labelledby="t-h">
+  <form id="tform" method="dialog" novalidate>
+    <header class="step-h"><span class="sn dot-c"></span><h2 id="t-h"></h2><button class="x" type="button" id="t-x"></button></header>
+    <div class="two"><label class="fld"><span id="l-from"></span><input id="t-from" maxlength="14"></label><label class="fld"><span id="l-to"></span><input id="t-to" maxlength="14"></label></div>
+    <label class="fld"><span id="l-date"></span><input id="t-date" maxlength="20"></label>
+    <label class="fld"><span id="l-budget"></span><input id="t-budget" type="number" min="0" max="10000" step="0.01"></label>
+    <div class="three"><label class="fld"><span id="l-dep"></span><input type="time" id="t-dep" step="300"></label><label class="fld"><span id="l-arr"></span><input type="time" id="t-arr" step="300"></label><label class="fld"><span id="l-ret"></span><input type="time" id="t-ret" step="300"></label></div>
+    <p class="warn" id="t-warn" role="alert"></p>
+    <footer class="dfoot"><button class="del" type="button" id="t-clear"></button><button class="go g" type="submit" id="t-save"></button></footer>
+  </form>
+</dialog>
+
+<p class="step-tip" id="step-tip" role="status" hidden></p>
+<p class="sr" id="say" aria-live="polite"></p>
+<script src="scenarios.js"></script>
+<script src="planner.js"></script>
+<script src="library.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
