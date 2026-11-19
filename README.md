@@ -1,5 +1,9 @@
 # TripFix
 
+The current browser prototype implements Priority Blocks, inspectable trip memory and traveller approval. [Run the prototype and replay the examples](TripFix/README.md) or [read the illustrated project report](TripFix/REPORT.md).
+
+## Earlier prototype
+
 Prose word count: 436
 
 ## Status and scope
