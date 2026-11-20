@@ -24,3 +24,21 @@ Thumbs.db
 # Logs
 *.log
 .runtime/
+
+# Working copies of the archived prototype may remain at their original local paths.
+/app.py
+/architecture.svg
+/index.html
+/report_draft.html
+/test_tripfix.py
+/tripfix.py
+/evidence/01-preview.jpg
+/evidence/02-saved.jpg
+/evidence/03-draft.jpg
+/evidence/04-revised.jpg
+/evidence/05-failed.jpg
+/evidence/06-recovered.jpg
+/evidence/preview.jpg
+/evidence/test-results.txt
+/docs/design-concept.md
+/docs/references.md

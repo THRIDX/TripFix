@@ -1,12 +1,14 @@
 # TripFix
 
-README prose word count: 514
+README prose word count: 539
 
 A cancelled train can leave three activities on the calendar and still cost a traveller the one they came for. TripFix lets the traveller choose what to protect, inspect the preferences behind a proposed repair and approve the changes.
 
-## Run the prototype
+## Start here · Current A2 demo
 
-From the repository root, use Python 3 to serve the English or Chinese browser interface.
+[Download the project ZIP](https://github.com/THRIDX/TripFix/archive/refs/heads/main.zip), extract it, and open `TripFix/index.html` in your browser. Select **English**, then **Start demo**. The [project report (PDF)](TripFix/TripFix_A2_Project_Report.pdf) follows this version.
+
+To serve the same demo with Python 3, run this from the repository root:
 
 ```sh
 python -m http.server 8788 --bind 127.0.0.1 --directory TripFix
@@ -30,18 +32,18 @@ HTML and CSS present the itinerary and controls. A JavaScript planner searches t
 
 | First prototype: proposed changes | Following revision: an unapplied edit |
 |---|---|
-| ![Early itinerary and proposed changes](evidence/preview.jpg) | ![Early repair screen with an edited requirement](evidence/03-draft.jpg) |
+| ![Early itinerary and proposed changes](archive/early-prototype/evidence/preview.jpg) | ![Early repair screen with an edited requirement](archive/early-prototype/evidence/03-draft.jpg) |
 
 - **Make remembered choices visible.** I placed **Preference Memory** between ranking and approval so the traveller could see which earlier assumptions still affected this trip. Moving Opera first overrides the sunset inference while retaining the budget. The [current controls](https://github.com/THRIDX/TripFix/commit/e0e78042d7ef5fb997cf738df9df9d84f86e4075) use the same names in the interface and report.
 
 ![Priority Block and Preference Memory after ranking Opera first](evidence/tripfix-storyboard-01-controls.jpg)
 
-- **Review and correction.** The [earlier interaction audit](https://github.com/THRIDX/TripFix/commit/578956d156be62c2ad3d5fc1c9b961f8e68f89f2) caught a preview that could survive an unapplied edit. The [twelve recorded checks](evidence/test-results.txt) cover that version. The [current storyboards](TripFix/REPORT.md#3-storyboards-and-illustrated-interaction) show the London outcome, conflicting locks and recovery after one unlock.
+- **Review and correction.** The [earlier interaction audit](https://github.com/THRIDX/TripFix/commit/578956d156be62c2ad3d5fc1c9b961f8e68f89f2) caught a preview that could survive an unapplied edit. The [twelve recorded checks](archive/early-prototype/evidence/test-results.txt) cover that version. The [current storyboards](TripFix/REPORT.md#3-storyboards-and-illustrated-interaction) show the London outcome, conflicting locks and recovery after one unlock.
 
 ## AI assistance and sources
 
-I defined the problem, project goal, London scenario and both core interaction designs. OpenAI Codex helped implement parts of the interface and planner, prepare the diagram and refine report wording. I removed percentage labels and variable block widths because neither expressed a meaningful preference. I also requested individual withdrawal where the draft only labelled an action reversible. I reviewed the resulting interface, and the London replay checks the planner outcomes against the report. The [A1 record](https://github.com/THRIDX/TripFix/blob/5cc5c54a50da62faed4cd06eca97b08656f1e381/README.md) documents earlier assistance from Claude Code. Course materials and research are credited in the report.
+I defined the problem, project goal, London scenario and both core interaction designs. OpenAI Codex assisted with coding parts of the interface and planner and with creating the system diagram. I removed percentage labels and variable block widths because neither expressed a meaningful preference. I also requested individual withdrawal where the draft only labelled an action reversible. I reviewed the resulting interface, and the London replay checks the planner outcomes against the report. The [A1 record](https://github.com/THRIDX/TripFix/blob/5cc5c54a50da62faed4cd06eca97b08656f1e381/README.md) documents earlier assistance from Claude Code. Course materials and research are credited in the report.
 
 ## Project files
 
-Open the [English report (PDF)](TripFix/TripFix_A2_Project_Report.pdf) for the architecture and storyboards. The [browser source](TripFix/), [editable system diagram](evidence/tripfix-system-architecture.svg) and [A1 design concept](docs/design-concept.md) are available separately.
+Open the [English report (PDF)](TripFix/TripFix_A2_Project_Report.pdf) for the architecture and storyboards. The [browser source](TripFix/), [editable system diagram](evidence/tripfix-system-architecture.svg) and [A1 design concept](archive/a1/design-concept.md) are available separately.
