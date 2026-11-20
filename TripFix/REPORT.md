@@ -1,19 +1,8 @@
 # TripFix: Who decides what survives a disrupted trip?
 
-**Word count: 1,319** (239 abstract and 1,080 main text).
+[Github Repo](https://github.com/THRIDX/TripFix) · [Readme.md](https://github.com/THRIDX/TripFix/blob/main/README.md)
 
-[Project repository](https://github.com/THRIDX/TripFix) · [Prototype README and development record](https://github.com/THRIDX/TripFix/blob/7d8f3e24da12094ac9135af6860665f4e8e14e2b/TripFix/README.md) · [Reviewed implementation, e0e7804](https://github.com/THRIDX/TripFix/tree/e0e78042d7ef5fb997cf738df9df9d84f86e4075/TripFix)
-
-| Counted material | English words | Limit |
-|---|---:|---:|
-| Abstract | 239 | 300 |
-| 1. Design rationale and project scope | 758 | |
-| 2. Architecture and technical rationale | 218 | |
-| 3. Storyboards and illustrated interaction | 104 | |
-| **Main text** | **1,080** | **1,100** |
-| **Abstract and main text** | **1,319** | **1,400** |
-
-Section 1 includes 345 words in the design rationale table. The main-text count includes section headings and written explanations. Figures, short captions, references and project links are excluded.
+word count 1319
 
 ## Abstract
 
@@ -78,5 +67,3 @@ We narrowed A1’s broader question about successive disruptions to repeated dec
 4. University of Birmingham, Intelligent Interactive Systems (2026). [Lecture 3, slides 9–10](https://canvas.bham.ac.uk/courses/90253/files/22437894), [Lecture 5, slides 8 and 11](https://canvas.bham.ac.uk/courses/90253/files/22460079), [Lecture 6, slide 13](https://canvas.bham.ac.uk/courses/90253/files/22460081).
 5. University of Birmingham, Intelligent Interactive Systems (2026). [Lecture 9, slides 12–14](https://canvas.bham.ac.uk/courses/90253/files/22503236).
 6. University of Birmingham, Intelligent Interactive Systems (2026). [Lecture 10, slide 12](https://canvas.bham.ac.uk/courses/90253/files/22507964), [Lecture 12, slides 12 and 16](https://canvas.bham.ac.uk/courses/90253/files/22507966).
-
-[Reviewed implementation, e0e7804](https://github.com/THRIDX/TripFix/tree/e0e78042d7ef5fb997cf738df9df9d84f86e4075/TripFix) · [Prototype README and development record](https://github.com/THRIDX/TripFix/blob/7d8f3e24da12094ac9135af6860665f4e8e14e2b/TripFix/README.md) · [Repository](https://github.com/THRIDX/TripFix)

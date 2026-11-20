@@ -1,49 +1,47 @@
 # TripFix
 
-The current browser prototype centres on two controls, Priority Block and Preference Memory. [Run the prototype and replay the examples](TripFix/README.md) or [read the illustrated project report](TripFix/REPORT.md).
+README prose word count: 514
 
-## Earlier prototype
+A cancelled train can leave three activities on the calendar and still cost a traveller the one they came for. TripFix lets the traveller choose what to protect, inspect the preferences behind a proposed repair and approve the changes.
 
-Prose word count: 436
+## Run the prototype
 
-## Status and scope
+From the repository root, use Python 3 to serve the English or Chinese browser interface.
 
-Interactive simulation of continuous travel repair. Visible requirements, previews, confirmation, failure handling and local undo work. Fixed rules and sample fares simulate planning and provider outcomes. Language input is an optional extension. Live bookings, payments and refunds are outside this version.
-
-The scenario preserves Riverside Hotel. Budget and latest hotel arrival are editable. Extra cost is the selected repair's total additional cost, not accumulated charges. State is held in memory for one local user and resets when the server restarts.
-
-## Run and inspect
-
-Python 3.9 or newer; standard library only. HTML, CSS and JavaScript implement the browser interface.
-
-```text
-python -B app.py
-python -B test_tripfix.py
+```sh
+python -m http.server 8788 --bind 127.0.0.1 --directory TripFix
 ```
 
-Open http://127.0.0.1:8772 and /report.
+Open the [English demo](http://127.0.0.1:8788/#en) and select **Start demo** on the Birmingham to London trip. No installation or API key is required if Python and a modern browser are available.
 
-Replay: review and confirm the £120 repair; change arrival to 19:00; apply requirements; review £170; choose “Next request fails” under Scenario controls; confirm; request a fresh repair and confirm again.
+## Replay the London decision
 
-## Development record
+1. After the cancellation, drag **Opera** first and **Spend less** second in **Priority Block**. Choose **Finish ranking**. In **Preference Memory**, the inferred sunset preference switches off and the £20 budget stays on.
+2. Choose **See proposed changes**. Check the 13:30 train, dinner at 16:45, the full 18:00 opera and the skipped walk. The additional cost is £12. Leave this proposal open for the next check.
+3. Lock both **Opera** and **Spend less**. Confirmation is blocked. Unlock only **Opera**. Entry at the 15:45 interval now costs £0 and can be confirmed. **Replay** resets the itinerary and keeps the trip’s preferences.
 
-- A1 foundation: [5cc5c54](https://github.com/THRIDX/TripFix/commit/5cc5c54); the October concept and reference list are retained in [docs/design-concept.md](docs/design-concept.md) and [docs/references.md](docs/references.md).
-- Scope decision: the original multi-service, model-backed concept was narrowed to two simulated flights, editable limits and local confirmation/recovery. Python standard-library code and plain HTML/JavaScript make these interactions repeatable without accounts or external dependencies.
-- Initial implementation: [fecee96](https://github.com/THRIDX/TripFix/commit/fecee96); state, preview, revision checks, undo and nine tests. These were delivered together.
-- Audit revision: [578956d](https://github.com/THRIDX/TripFix/commit/578956d); unapplied input now blocks review and confirmation, identical repairs produce no preview, and repeated fare events preserve state. Outcome messages describe actual changed fields. These corrections address mismatches between displayed information and effective state.
-- Report and screenshots: [4050dee](https://github.com/THRIDX/TripFix/commit/4050dee); updated the rationale, architecture and six-screen sequence after the audit.
-- Verification: twelve executable tests pass, including empty repair, repeated fare and a second repair after confirmation with failure, retry and undo. Chrome checks confirmed disabled confirmation after an unapplied budget edit and the continuous sequence. No browser errors were reported.
+## What runs
 
-## Contributions, reused material and AI assistance
+HTML and CSS present the itinerary and controls. A JavaScript planner searches train and activity combinations, enforces locks and compares feasible plans in the traveller’s chosen order. Browser storage retains settings per trip. The cancellation, fares, historical preferences and external booking or messaging effects are simulated. The demo runs locally without a language model. Live provider integration is outside its scope. Testing whether travellers understand the trade-offs remains future work.
 
-The scenario and interaction priorities follow the TripFix proposal in A1. Earlier A1 work and repository preparation used Claude Code, as recorded in the [original README](https://github.com/THRIDX/TripFix/blob/5cc5c54/README.md). Course concepts and research are credited in the report. OpenAI Codex assisted with implementation, tests, report wording and the system diagram. Review of its initial output exposed the three interaction inconsistencies above; the corrected behaviour was checked through executable tests and Chrome walkthroughs. The six screenshots were captured from the running application.
+## Development and ownership
 
-## Files and review version
+- **From a list to a choice.** The [first prototype](https://github.com/THRIDX/TripFix/commit/fecee9653790bb0a422fb6dabc4aa9f46906f165) listed current and proposed changes. It could show a moved activity, but the traveller had no way to say which one mattered most. I introduced draggable priorities and separate locks so a preference could be distinguished from a firm requirement. The [interaction implementation](https://github.com/THRIDX/TripFix/commit/82dc02b3af5b080f1bdea3720f7100df071f49ca) connects both controls to the planner.
 
-- `report_draft.html`: report, architecture and three illustrated episodes.
-- `architecture.svg`: logical components and implementation boundaries.
-- `evidence/01-preview.jpg` through `06-recovered.jpg`: successive screens.
-- `evidence/test-results.txt`: executable test results.
-- Public repository: [THRIDX/TripFix](https://github.com/THRIDX/TripFix). GitHub review version: [a2-github-review-1](https://github.com/THRIDX/TripFix/tree/a2-github-review-1). The earlier local review tag `a2-review-2` is retained. Canvas submission remains pending.
+| First prototype: proposed changes | Following revision: an unapplied edit |
+|---|---|
+| ![Early itinerary and proposed changes](evidence/preview.jpg) | ![Early repair screen with an edited requirement](evidence/03-draft.jpg) |
 
-No separate ZIP, API key or video is needed to inspect this version.
+- **Make remembered choices visible.** I placed **Preference Memory** between ranking and approval so the traveller could see which earlier assumptions still affected this trip. Moving Opera first overrides the sunset inference while retaining the budget. The [current controls](https://github.com/THRIDX/TripFix/commit/e0e78042d7ef5fb997cf738df9df9d84f86e4075) use the same names in the interface and report.
+
+![Priority Block and Preference Memory after ranking Opera first](evidence/tripfix-storyboard-01-controls.jpg)
+
+- **Review and correction.** The [earlier interaction audit](https://github.com/THRIDX/TripFix/commit/578956d156be62c2ad3d5fc1c9b961f8e68f89f2) caught a preview that could survive an unapplied edit. The [twelve recorded checks](evidence/test-results.txt) cover that version. The [current storyboards](TripFix/REPORT.md#3-storyboards-and-illustrated-interaction) show the London outcome, conflicting locks and recovery after one unlock.
+
+## AI assistance and sources
+
+I defined the problem, project goal, London scenario and both core interaction designs. OpenAI Codex helped implement parts of the interface and planner, prepare the diagram and refine report wording. I removed percentage labels and variable block widths because neither expressed a meaningful preference. I also requested individual withdrawal where the draft only labelled an action reversible. I reviewed the resulting interface, and the London replay checks the planner outcomes against the report. The [A1 record](https://github.com/THRIDX/TripFix/blob/5cc5c54a50da62faed4cd06eca97b08656f1e381/README.md) documents earlier assistance from Claude Code. Course materials and research are credited in the report.
+
+## Project files
+
+Open the [English report (PDF)](TripFix/TripFix_A2_Project_Report.pdf) for the architecture and storyboards. The [browser source](TripFix/), [editable system diagram](evidence/tripfix-system-architecture.svg) and [A1 design concept](docs/design-concept.md) are available separately.
