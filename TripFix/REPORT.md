@@ -1,24 +1,26 @@
 # TripFix: Who decides what survives a disrupted trip?
 
-Word count: 1155 (151 abstract and 1004 main text, including the rationale table and headings).
+Word count: 1297 (215 abstract and 1082 main text, including the rationale table and headings).
 
 ## Abstract
 
-A cancelled train leaves a traveller with a choice: pay £12 to see the whole opera that evening, or spend nothing extra and arrive at the interval. A timetable can show which options are possible. Only the traveller can say which is worth taking.
+Two travellers have planned the same day in London: an opera, dinner with a friend and a walk by the river at sunset. When their train is cancelled, one would gladly give up the walk to hear the whole performance. For the other, sunset by the river was the reason for the trip. The same trains are available to both, but a good repair depends on what each traveller most wants to keep.
 
-TripFix helps travellers make that choice through two controls. In **Priority Block**, they rank what matters today and lock anything they must keep. In **Preference Memory**, they see what the system remembers, where each preference came from and whether it still applies. A traveller who usually puts sunset first can choose the opera today and keep their usual spending limit. The planner then shows the revised day, including what it would cost and what they would miss, before they confirm. We built and tested this interaction in a browser using a simulated train cancellation, fares and bookings. The walkthrough follows one disruption through several changes of mind.
+TripFix lets travellers express that choice and see what it means for the rest of the day. In **Priority Block**, they rank activities and lock anything they must keep. **Preference Memory** shows which earlier preferences are in use and where they came from. A traveller can put the opera first today while keeping a familiar spending limit. The planner works out what still fits and shows the new times, extra cost and missed activities. Travellers can reconsider once they see the consequences.
+
+This is a mixed-initiative design: the traveller decides what makes the trip worthwhile, and the system finds a feasible way to preserve it. We built the prototype in a browser and tested repeated corrections after one simulated cancellation. The walkthrough shows how one changed requirement resolves a conflict. Whether travellers find the resulting trip more satisfying remains to be evaluated.
 
 ## 1. Design rationale and project scope
 
-### What is the traveller trying to keep?
+### What makes a repaired trip worth taking?
 
-On the original itinerary, the opera comes first, dinner with Lina comes next and the walk by the river comes last. That order makes sense while everything runs on time. Once the train is cancelled, moving the walk to 20:15 still leaves a slot labelled “walk”, but the sun will have set. Equally, the traveller may be happy to miss the walk if it means hearing the opening of the opera. The order of the day tells us little about which loss matters more. How can a traveller make that judgement visible, and correct the system if it carries yesterday’s preference into today’s plan?
+In the London itinerary, the opera starts at 14:30, dinner with Lina at 17:00 and the riverside walk at 18:10. After a train cancellation, moving the walk to 20:15 still leaves “walk” on the calendar, yet the chance to see the sunset has gone. Moving the opera to the evening could save the whole performance at the cost of that same sunset. Both repairs can be explained in terms of times and tickets. Choosing between them requires knowing why this person wanted to travel. Our design question is how a traveller can tell the system what matters now, discover what that choice would cost elsewhere in the day, and reconsider it while there is still time.
 
-Assignment 1 brought together two bodies of evidence. TripTide found that language models often preserved an itinerary’s intent and sequence, but handled disruptions less successfully as itineraries grew longer [1]. Zhou and colleagues studied when people should check a multistep agent’s work. Of 48 participants, 39 preferred intermediate checks to confirmation at the end [2]. The first study evaluates revised plans. The second concerns opportunities to intervene in other tasks. Together they suggest a place to intervene: after the disruption, while the traveller can still change what the repair protects.
+Assignment 1 identified two parts of this problem. TripTide found that language models often preserved the intent and sequence of an itinerary, although their ability to repair it deteriorated on longer trips [1]. Its measures tell us how closely a revision follows an existing plan. After a cancellation, departing from that plan may be exactly what a traveller wants. Zhou and colleagues investigated when users should inspect an agent’s work. In their multistep tasks, 39 of 48 participants preferred intermediate checks to confirmation at the end [2]. This supports giving people a chance to intervene, while leaving open what a traveller should be able to change. TripFix connects the two findings by making priorities editable before replanning and showing the consequences while the traveller can still reject them.
 
 ### Two core designs: Priority Block and Preference Memory
 
-**Priority Block** gives the traveller a way to say what matters on this trip. **Preference Memory** lets them check what the system has carried forward. The distinction matters when the two disagree. A traveller can move Opera above Sunset walk, see the old sunset preference switch off, and keep the £20 rebooking limit they still want.
+**Priority Block** answers “What do I most want to keep today?” The traveller puts that activity first and can lock it if a compromise would defeat its purpose. **Preference Memory** answers “What is TripFix assuming about me?” A past trip might suggest putting sunset first, while a budget the traveller set explicitly might still suit today. Moving Opera up switches off the old ordering and preserves the budget. The traveller can see the correction take effect without having to describe the entire trip again.
 
 | Design choice | Why it suits the problem | Evidence behind the choice | Status |
 |---|---|---|---|
