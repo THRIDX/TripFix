@@ -551,7 +551,7 @@ function renderText() {
   const running = S.waiting || S.n > 0;
   $('replay').className = running ? 'replay' : 'replay start-demo g';
   $('replay').innerHTML = running ? icon('undo') + L('重新演示','Replay') : L('开始演示','Start demo');
-  $('h-rank').textContent = L('优先级', 'Priority');
+  $('h-rank').textContent = L('优先级块', 'Priority Block');
   $('ax-hi').textContent = L('高', 'Hi');
   $('ax-lo').textContent = L('低', 'Lo');
   $('ax-name').textContent = L('优先级', 'PRIORITY');
@@ -561,7 +561,7 @@ function renderText() {
   const lastEdit = S.hist[S.hist.length - 1];
   $('edit-undo').disabled = !lastEdit;
   $('edit-undo').innerHTML = icon('undo') + (lastEdit?.deleted ? L('撤销删除', 'Undo delete') : L('撤销', 'Undo'));
-  $('h-think').textContent = L('行程偏好', 'Trip preferences');
+  $('h-think').textContent = L('偏好记忆', 'Preference Memory');
   $('h-req').textContent = L('本次偏好', 'Current preferences');
   $('h-mem').textContent = L('历史偏好', 'Past preferences');
   $('h-book').textContent = L('待确认', 'Pending actions');
