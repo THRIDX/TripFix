@@ -1,6 +1,6 @@
 # TripFix
 
-The current browser prototype implements Priority Blocks, inspectable trip memory and traveller approval. [Run the prototype and replay the examples](TripFix/README.md) or [read the illustrated project report](TripFix/REPORT.md).
+The current browser prototype centres on two controls, Priority Block and Preference Memory. [Run the prototype and replay the examples](TripFix/README.md) or [read the illustrated project report](TripFix/REPORT.md).
 
 ## Earlier prototype
 
