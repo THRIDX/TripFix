@@ -27,7 +27,7 @@ function places(a, ready, dayEnd, flexOn, fixed) {
     if (flexOn) {
       for (let s = f.from; s + f.min <= f.to; s += 15) {
         if (s + f.dur <= f.to) add(s, s + f.dur);
-        if (f.min < f.dur) add(s, s + f.min, true, 0, {zh: '缩短', en: 'shortened'});
+        if (f.min < f.dur) add(s, s + f.min, true, 0, 'shortened');
       }
     } else if (a.plan.s >= f.from && a.plan.e <= f.to) add(a.plan.s, a.plan.e);
   }
@@ -136,18 +136,18 @@ P.solve = (sc, n, prefs) => {
   return solveLargerTrip(st,acts,legs,prefs,now,fixed);
 };
 
-P.actions = (sc, cur, next, L) => {
-  const list = [], name = id => L(sc.acts.find(a => a.id === id).name);
+P.actions = (sc, cur, next) => {
+  const list = [], name = id => sc.acts.find(a => a.id === id).name;
   const fmt = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
-  if (next.leg.id !== cur.leg.id) list.push({key:'transport', icon: 'train', text: L(next.leg.name), cost: next.leg.cost, rev: next.leg.cost === 0});
+  if (next.leg.id !== cur.leg.id) list.push({key:'transport', icon: 'train', text: next.leg.name, cost: next.leg.cost, rev: next.leg.cost === 0});
   for (const a of sc.acts) {
     const x = cur.at[a.id], y = next.at[a.id];
     if (!!x.drop === !!y.drop && (y.drop || (x.s === y.s && x.e === y.e))) continue;
     const when = y.drop ? '' : fmt(y.s);
-    if (a.kind === 'social') list.push({key:a.id, icon: 'msg', text: y.drop ? L({zh: `告诉 ${a.who}：今天见不了`, en: `Tell ${a.who}: can’t meet today`}) : L({zh: `问 ${a.who}：改到 ${when}`, en: `Ask ${a.who}: move to ${when}`}), cost: 0, rev: false});
-    else if (a.kind === 'ticket') list.push(y.drop ? {key:a.id, icon: a.icon, text: L({zh: `转售「${name(a.id)}」票`, en: `Resell the ${name(a.id)} ticket`}), cost: 0, rev: false}
-      : {key:a.id, icon: a.icon, text: `${name(a.id)} → ${when}${y.note ? ' · ' + L(y.note) : ''}`, cost: y.cost, rev: !y.cost});
-    else list.push({key:a.id, icon: a.icon, text: y.drop ? L({zh: `不去${name(a.id)}`, en: `Skip ${name(a.id)}`}) : `${name(a.id)} → ${when}${y.note ? ' · ' + L(y.note) : ''}`, cost: 0, rev: true});
+    if (a.kind === 'social') list.push({key:a.id, icon: 'msg', text: y.drop ? `Tell ${a.who}: can’t meet today` : `Ask ${a.who}: move to ${when}`, cost: 0, rev: false});
+    else if (a.kind === 'ticket') list.push(y.drop ? {key:a.id, icon: a.icon, text: `Resell the ${name(a.id)} ticket`, cost: 0, rev: false}
+      : {key:a.id, icon: a.icon, text: `${name(a.id)} → ${when}${y.note ? ' · ' + y.note : ''}`, cost: y.cost, rev: !y.cost});
+    else list.push({key:a.id, icon: a.icon, text: y.drop ? `Skip ${name(a.id)}` : `${name(a.id)} → ${when}${y.note ? ' · ' + y.note : ''}`, cost: 0, rev: true});
   }
   return list;
 };

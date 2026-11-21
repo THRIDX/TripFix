@@ -4,13 +4,6 @@ const $ = id => document.getElementById(id);
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const buzz = p => { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} };
 
-let lang = (() => {
-  const h = location.hash.slice(1);
-  if (h === 'zh' || h === 'en') return h;
-  try { return localStorage.getItem('tripfix-lang') === 'en' ? 'en' : 'zh'; } catch (e) { return 'zh'; }
-})();
-const L = (a, b) => a && typeof a === 'object' ? a[lang] : (lang === 'en' ? b : a);
-
 const PATH = {
   opera: 'M5 4h14v7a7 7 0 0 1-14 0z M9.2 9h.01 M14.8 9h.01 M9 13.2c1.6 1.5 4.4 1.5 6 0',
   dinner: 'M7 3v18 M4.5 3v5a2.5 2.5 0 0 0 5 0V3 M17.5 21V3c-2.2 1.6-3 4.8-3 8.5h3',
@@ -71,16 +64,16 @@ for (const record of TripLibrary.entries()) {
   savedPrefs.set(t.id, record.prefs || {});
 }
 let creating = null, previousTrip = null, feedTimer = null;
-const routeName = trip => `${L(trip.from)} → ${L(trip.to)}`;
+const routeName = trip => `${trip.from} → ${trip.to}`;
 function persist() {
   if (!SC || SC.id === 'blank' || creating) return;
   savedPrefs.set(SC.id, {order: S.order.slice(), mem: {...S.mem}, locks: {...S.locks}, guess:S.guess, manualOrder:S.manualOrder?.slice()});
-  if (!TripLibrary.save(SC, S)) say(L('浏览器未能保存行程', 'Browser storage is unavailable'));
+  if (!TripLibrary.save(SC, S)) say('Browser storage is unavailable');
 }
 let SC, S;
 const act = id => SC.acts.find(a => a.id === id);
 const col = id => id === 'money' ? '#2a2d33' : (act(id) ? act(id).color : '#999');
-const name = id => id === 'money' ? L('少花钱', 'Spend less') : esc(L(act(id).name));
+const name = id => id === 'money' ? 'Spend less' : esc(act(id).name);
 const mem = k => SC.memory.find(m => m.id === k);
 const shown = () => S.pending || S.confirmed;
 const state = () => S.res ? S.res.st : Planner.state(S.trip, 0);
@@ -91,15 +84,14 @@ function genericEvents(t) {
   const leg = t.legs[0], dep = leg.dep + 90, arr = leg.arr + 90;
   return [{
     at: Math.max(t.view[0], leg.dep - 30), icon: 'train',
-    title: {zh: '列车取消', en: 'Train cancelled'}, service: fmt(leg.dep),
-    detail: {zh: '下一班 ' + fmt(dep) + '，' + fmt(arr) + ' 到' + t.to.zh,
-      en: 'Next train ' + fmt(dep) + ', arriving in ' + t.to.en + ' at ' + fmt(arr)},
+    title: 'Train cancelled', service: fmt(leg.dep),
+    detail: ('Next train ' + fmt(dep) + ', arriving in ' + t.to + ' at ' + fmt(arr)),
     patch: st => {
       st.broken = st.legs[0];
       st.legs = [
-        {...leg, id:'next', dep, arr, cost:0, name:{zh:'下一班 ' + fmt(dep), en:'Next train ' + fmt(dep)}},
+        {...leg, id:'next', dep, arr, cost:0, name:('Next train ' + fmt(dep))},
         {...leg, id:'fast', dep:leg.dep+15, arr:leg.arr+20, cost:20,
-          name:{zh:'快车 ' + fmt(leg.dep+15), en:'Express ' + fmt(leg.dep+15)}}
+          name:('Express ' + fmt(leg.dep+15))}
       ];
     }
   }];
@@ -164,18 +156,18 @@ function routeItems(el) {
   if (st.broken) items.push({k: 'brk', cls: 'seg broken', style: span(st.broken.dep, st.broken.arr)});
   items.push({k: 'leg', cls: 'seg leg', style: span(plan.leg.dep, plan.leg.arr)});
   const stops = [
-    {k: 't0', t: plan.leg.dep, travel: true, ic: 'train', nm: esc(L(plan.leg.a))},
-    {k: 't1', t: plan.leg.arr, travel: true, nm: esc(L(plan.leg.b))}
+    {k: 't0', t: plan.leg.dep, travel: true, ic: 'train', nm: esc(plan.leg.a)},
+    {k: 't1', t: plan.leg.arr, travel: true, nm: esc(plan.leg.b)}
   ];
   for (const a of SC.acts) {
     const p = plan.at[a.id], o = a.plan, c = a.color;
     if (!p) continue;
     const changing = ref && ref.at[a.id] && !Planner.same({leg: plan.leg, at: {[a.id]: p}}, {leg: plan.leg, at: {[a.id]: ref.at[a.id]}});
     items.push({k: 'b-' + a.id, id: a.id, cls: 'seg g' + (changing ? ' next' : ''), style: p.drop ? `--l:${X(o.s)};--w:0%;--c:${c};opacity:0` : `${span(p.s, p.e)};--c:${c}`});
-    stops.push({k: a.id, id: a.id, t: p.drop ? o.s : p.s, old: !p.drop && p.s !== o.s ? o.s : null, ic: a.icon, nm: esc(L(a.name)), place: esc(L(a.place || {zh: '', en: ''})), drop: p.drop, c, hit: changing});
+    stops.push({k: a.id, id: a.id, t: p.drop ? o.s : p.s, old: !p.drop && p.s !== o.s ? o.s : null, ic: a.icon, nm: esc(a.name), place: esc((a.place || '')), drop: p.drop, c, hit: changing});
   }
   const home = SC.home.t + (st.dayEnd - SC.dayEnd);
-  stops.push({k: 'home', t: home, travel: true, ic: 'train', nm: L('回程', 'Home'), end: true});
+  stops.push({k: 'home', t: home, travel: true, ic: 'train', nm: 'Home', end: true});
   stops.sort((a, b) => a.t - b.t);
   const w = el.clientWidth || 1000, last = [-1e9, -1e9];
   stops.forEach(s => { s.px = frac(s.t) * w; s.row = 0; });
@@ -211,14 +203,14 @@ function patchRoute() {
 }
 function renderCountdown() {
   const seconds = S.secondsLeft;
-  $('demo-clock').textContent = L(`${seconds}s后更新状态`, `Status updates in ${seconds}s`);
+  $('demo-clock').textContent = `Status updates in ${seconds}s`;
 }
 function renderTop() {
-  $('kick').textContent = L(SC.date);
+  $('kick').textContent = SC.date;
   $('route-label').textContent = routeName(SC);
-  $('trips').title = L('选择行程','Choose a trip');
+  $('trips').title = 'Choose a trip';
   $('edit-trip').innerHTML = icon('pencil');
-  $('edit-trip').setAttribute('aria-label', L('编辑行程信息', 'Edit trip details'));
+  $('edit-trip').setAttribute('aria-label', 'Edit trip details');
   const ev = $('ev'), message = $('event-message');
   ev.hidden = !S.waiting && !S.n;
   $('demo-clock').hidden = !S.waiting;
@@ -228,9 +220,9 @@ function renderTop() {
   let html = '';
   if (S.n) {
     const e = S.events[S.n - 1];
-    html = icon(e.icon) + '<strong>' + esc(L(e.title)) + '</strong>' +
+    html = icon(e.icon) + '<strong>' + esc(e.title) + '</strong>' +
       (e.service ? '<span>' + esc(e.service) + '</span>' : '') +
-      '<small>' + esc(L(e.detail)) + '</small>';
+      '<small>' + esc(e.detail) + '</small>';
   }
   if (message._html !== html) {message.innerHTML = html; message._html = html;}
   patchRoute();
@@ -252,20 +244,20 @@ function updateBar(li, id) {
   li.className = 'bar' + (status === 'dropped' ? ' drop' : '') + (S.locks[id] ? ' locked' : '') + (clashIds().includes(id) ? ' clash' : '');
   const color = col(id);
   li.style.setProperty('--c', barColors[color] || color);
-  const label = id === 'money' ? L('少花钱','Spend less') + ' · £' + plan.cost : name(id);
+  const label = id === 'money' ? 'Spend less' + ' · £' + plan.cost : name(id);
   const body = '<span class="ico">' + icon(id === 'money' ? 'money' : act(id).icon) + '</span><b>' + label + '</b>';
   const b = li.querySelector('.body');
   if (b._h !== body) {b.innerHTML = body; b._h = body;}
   const p = plan.at[id];
   let detail = '';
-  if (p?.drop) detail = L('取消此项','Skipped');
-  else if (p && (status === 'moved' || status === 'short')) detail = fmt(p.s) + (p.note ? ' ' + L(p.note) : '–' + fmt(p.e));
+  if (p?.drop) detail = 'Skipped';
+  else if (p && (status === 'moved' || status === 'short')) detail = fmt(p.s) + (p.note ? ' ' + p.note : '–' + fmt(p.e));
   const why = li.querySelector('.why'); why.textContent = detail; why.title = detail;
   const lock = li.querySelector('.lock');
   lock.dataset.lock = id; lock.setAttribute('aria-pressed', !!S.locks[id]);
-  lock.setAttribute('aria-label', S.locks[id] ? L('解锁', 'Unlock') : L('锁定', 'Lock'));
+  lock.setAttribute('aria-label', S.locks[id] ? 'Unlock' : 'Lock');
   lock.innerHTML = icon(S.locks[id] ? 'lock' : 'unlock');
-  li.setAttribute('aria-label', `${id === 'money' ? L('少花钱', 'Spend less') : L(act(id).name)} ${detail}`);
+  li.setAttribute('aria-label', `${id === 'money' ? 'Spend less' : act(id).name} ${detail}`);
   li.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown Enter Delete');
 }
 let dropRects = null;
@@ -283,7 +275,7 @@ function patchBars() {
   const empty = !SC.acts.length;
   $('stackwrap').hidden = empty; $('empty').hidden = !empty;
   if (empty) {
-    $('empty').innerHTML = `<span class="e-ic">${icon('pin')}</span><b>${L('还没有安排', 'Nothing planned yet')}</b><button class="add g" type="button" data-add>${icon('plus')}${L('添加第一个', 'Add the first one')}</button>`;
+    $('empty').innerHTML = `<span class="e-ic">${icon('pin')}</span><b>${'Nothing planned yet'}</b><button class="add g" type="button" data-add>${icon('plus')}${'Add the first one'}</button>`;
     $('bars').innerHTML = ''; $('guess').innerHTML = '';
     return;
   }
@@ -293,7 +285,7 @@ function patchBars() {
   S.order.forEach(id => { let n = old.get(id); if (!n) n = makeBar(id); old.delete(id); updateBar(n, id); box.appendChild(n); });
   old.forEach(n => n.remove());
 
-  $('guess').innerHTML = S.guess ? `<button type="button" class="g" id="use">${L('采用排序', 'Use order')}</button>` : '';
+  $('guess').innerHTML = S.guess ? `<button type="button" class="g" id="use">${'Use order'}</button>` : '';
   if ($('use')) $('use').onclick = () => change(() => { S.guess = false; });
   if (reduce) return;
   box.querySelectorAll('.bar').forEach(n => {
@@ -343,7 +335,7 @@ function dnd(box, onDrop, onTrash, onClick) {
     box.appendChild(d.marker);
     d.it.classList.add('fb-src'); document.body.classList.add('dragging');
     trash.className = 'trash show';
-    trash.innerHTML = icon('trash') + L('删除', 'Delete');
+    trash.innerHTML = icon('trash') + 'Delete';
     buzz(8);
   }
   function move(e) {
@@ -395,11 +387,11 @@ function dnd(box, onDrop, onTrash, onClick) {
 function renderThink() {
   const items = [];
   const top = S.order.find(id => id !== 'money') && S.order[0];
-  if (top) items.push({cls: 'rk', id: top, ic: 'drag', text: (top === 'money' ? L('最先考虑省钱', 'Prioritise saving money') : L(`最想保住：${name(top)}`, `Protect first: ${name(top)}`))});
-  for (const id of S.order) if (S.locks[id]) items.push({cls: 'lk', id, ic: 'lock', text: (id === 'money' ? L('锁定：不额外花钱', 'Locked: no extra cost') : L(`必须完整保留：${name(id)}`, `Keep in full: ${name(id)}`))});
+  if (top) items.push({cls: 'rk', id: top, ic: 'drag', text: (top === 'money' ? 'Prioritise saving money' : `Protect first: ${name(top)}`)});
+  for (const id of S.order) if (S.locks[id]) items.push({cls: 'lk', id, ic: 'lock', text: (id === 'money' ? 'Locked: no extra cost' : `Keep in full: ${name(id)}`)});
   const cap = mem('cap'), limit = cap && S.mem.cap ? cap.cap : 0;
-  if (SC.acts.length) items.push({cls:'rk', ic:'money', text: limit ? L(`改签最多补 £${limit}`, `Up to £${limit} extra to rebook`) : L('只选无需补款的方案', 'No extra cost')});
-  if (!items.length) items.push({cls: 'rk', ic: 'spark', text: L('添加安排后可设置优先级', 'Add an activity to set a priority')});
+  if (SC.acts.length) items.push({cls:'rk', ic:'money', text: limit ? `Up to £${limit} extra to rebook` : 'No extra cost'});
+  if (!items.length) items.push({cls: 'rk', ic: 'spark', text: 'Add an activity to set a priority'});
   const html = items.map(r => `<li class="req ${r.cls}"${r.id ? ` data-id="${r.id}"` : ''}><span class="src${r.cls === 'ev' || r.cls === 'lk' ? ' g' : ''}">${icon(r.ic)}</span>${r.id ? `<span class="dot" style="--c:${col(r.id)}"></span>` : ''}<span>${r.text}</span></li>`).join('');
   if ($('reqs')._h !== html) { $('reqs').innerHTML = html; $('reqs')._h = html; }
 }
@@ -407,7 +399,7 @@ function renderMem() {
   const box = $('mems');
   if (!SC.memory.length) {
     box.innerHTML = '<p class="no-memory"></p>';
-    box.firstChild.textContent = L('这趟行程还没有已保存的偏好。', 'No saved preferences for this trip yet.');
+    box.firstChild.textContent = 'No saved preferences for this trip yet.';
     return;
   }
   if (box.dataset.keys !== SC.memory.map(m => m.id).join() || !box.querySelector('[data-m]')) {
@@ -423,15 +415,15 @@ function renderMem() {
     if (m.id === 'flex' && on && act(m.flexOf)) { const p = plan.at[m.flexOf]; if (p && !p.drop && p.s !== act(m.flexOf).plan.s) used = [m.flexOf]; }
     el.classList.toggle('off', !on); el.classList.toggle('inuse', on && used.length > 0);
     el.setAttribute('aria-pressed', on);
-    el.querySelector('b span').textContent = L(m.text);
-    el.querySelector('small').textContent = L(m.src);
-    el.querySelector('.used').textContent = L('本次采用', 'Applied');
+    el.querySelector('b span').textContent = m.text;
+    el.querySelector('small').textContent = m.src;
+    el.querySelector('.used').textContent = 'Applied';
   }
 }
 
 /* ---------- step 3: new tickets and actions ---------- */
 function actions(before,after) {
-  return Planner.actions(S.trip,before,after,L);
+  return Planner.actions(S.trip,before,after);
 }
 function actionChoice(plan,key) {
   return key === 'transport' ? plan.leg.id : Planner.optionKey(plan.at[key]);
@@ -447,28 +439,28 @@ function renderBook() {
   const rows = [];
   function row(a, stage, reversible) {
     const text = esc(a.text);
-  const buttonText = stage === 'pending' ? L('撤回建议','Withdraw suggestion') : L('撤回已确认改动','Undo confirmed change');
+  const buttonText = stage === 'pending' ? 'Withdraw suggestion' : 'Undo confirmed change';
     const control = reversible
       ? '<button type="button" class="rv" data-stage="'+stage+'" data-action="'+esc(a.key)+'" aria-label="'+buttonText+' · '+text+'">'+icon('undo')+buttonText+'</button>'
-      : '<span class="rv">'+(stage === 'pending' ? L('确认后不可撤回','Final once confirmed') : L('已执行','Completed'))+'</span>';
+      : '<span class="rv">'+(stage === 'pending' ? 'Final once confirmed' : 'Completed')+'</span>';
     return '<li class="act '+(reversible?'rev':'irr')+'"><span class="ai">'+icon(a.icon)+'</span><span class="tx">'+text+'</span><span class="cost">'+(a.cost?'£'+a.cost:'')+'</span>'+control+'</li>';
   }
-  if (S.step === 2 || S.step === 3) rows.push('<li class="empty">'+(S.step === 2 ? L('等待确定优先级','Waiting for your priorities') : L('等待核对偏好','Waiting for your preference review'))+'</li>');
-  else if (S.think) rows.push('<li class="empty">'+L('等待新方案','Waiting for a proposal')+'</li>');
-  else if (S.res?.ok === false) rows.push('<li class="empty">'+(clashIds().length ? L('锁定的安排无法同时满足','Locked plans conflict') : L('当前条件下没有其他方案','No other option fits the current limits'))+'</li>');
+  if (S.step === 2 || S.step === 3) rows.push('<li class="empty">'+(S.step === 2 ? 'Waiting for your priorities' : 'Waiting for your preference review')+'</li>');
+  else if (S.think) rows.push('<li class="empty">'+'Waiting for a proposal'+'</li>');
+  else if (S.res?.ok === false) rows.push('<li class="empty">'+(clashIds().length ? 'Locked plans conflict' : 'No other option fits the current limits')+'</li>');
   for (const a of proposed) rows.push(row(a,'pending',a.rev));
   for (const entry of S.applied) {
     const a = actions(entry.before,entry.after).find(item => item.key === entry.key);
     if (a) rows.push(row(a,'confirmed',canWithdraw(entry)));
   }
-  if (!rows.length) rows.push('<li class="empty">'+icon('check')+L('暂无变更','No changes')+'</li>');
-  if (!S.think && S.res?.ok === false && Object.keys(S.excluded).length) rows.push('<li><button type="button" class="recover" data-restore-options>'+L('重新考虑已撤回的选项','Reconsider withdrawn options')+'</button></li>');
+  if (!rows.length) rows.push('<li class="empty">'+icon('check')+'No changes'+'</li>');
+  if (!S.think && S.res?.ok === false && Object.keys(S.excluded).length) rows.push('<li><button type="button" class="recover" data-restore-options>'+'Reconsider withdrawn options'+'</button></li>');
   const html=rows.join('');
   if ($('acts')._h !== html) {$('acts').innerHTML=html; $('acts')._h=html;}
-  $('total').innerHTML='<small>'+L('额外花费','Extra cost')+'</small>£'+shown().cost;
+  $('total').innerHTML='<small>'+'Extra cost'+'</small>£'+shown().cost;
   const irr=proposed.filter(a => !a.rev).length;
   $('go').disabled=S.think || !S.pending;
-  $('go').innerHTML=icon('check')+(irr ? L('同意 '+irr+' 项并确认','Approve '+irr+' & confirm') : L('确认','Confirm'));
+  $('go').innerHTML=icon('check')+(irr ? ('Approve '+irr+' & confirm') : 'Confirm');
 }
 
 /* ---------- guidance across the three steps ---------- */
@@ -477,12 +469,12 @@ let cueTimer, pulseTimer, cueStep = 0;
 const panels = {2:'f1', 3:'f2', 4:'f3'};
 function cueText(step) {
   if (step === 2) return SC.acts.length
-    ? L('哪项安排最重要？把它拖到最上面。','Which activity matters most? Drag it to the top.')
-    : L('核对当前优先级，然后继续。','Review your priorities, then continue.');
-  if (step === 3) return L('请核对系统采用的偏好，关掉不适用的。','Review the preferences and turn off any that no longer apply.');
-  if (S.res?.ok === false) return L('这些条件无法同时满足，请调整锁定项或偏好。','These constraints conflict. Review your locks or preferences.');
-  if (!S.pending) return L('现有安排可以保留，请核对行程。','Your plans can stay as they are. Review the itinerary.');
-  return L('请核对改动和费用，再决定是否确认。','Review the changes and cost before confirming.');
+    ? 'Which activity matters most? Drag it to the top.'
+    : 'Review your priorities, then continue.';
+  if (step === 3) return 'Review the preferences and turn off any that no longer apply.';
+  if (S.res?.ok === false) return 'These constraints conflict. Review your locks or preferences.';
+  if (!S.pending) return 'Your plans can stay as they are. Review the itinerary.';
+  return 'Review the changes and cost before confirming.';
 }
 function positionCue() {
   if (!cueStep) return;
@@ -515,12 +507,12 @@ function guide() {
   $('a23').classList.toggle('run', S.step === 3 || S.think);
   $('thinking').hidden = !S.think;
   $('f2').setAttribute('aria-busy', String(S.think));
-  $('thinking-label').textContent = S.think ? L('正在思考…', 'Thinking…') : '';
-  $('think-progress').setAttribute('aria-label', L('正在调整行程', 'Replanning the trip'));
-  $('rank-done').textContent = L('排序完成', 'Finish ranking');
+  $('thinking-label').textContent = S.think ? 'Thinking…' : '';
+  $('think-progress').setAttribute('aria-label', 'Replanning the trip');
+  $('rank-done').textContent = 'Finish ranking';
   $('rank-done').hidden = S.step !== 2;
   $('guess').hidden = S.step === 2;
-  $('review-done').textContent = L('查看调整方案', 'See proposed changes');
+  $('review-done').textContent = 'See proposed changes';
   $('review-foot').hidden = S.step !== 3;
   if (cueStep) {$('step-tip').textContent = cueText(cueStep); positionCue();}
 }
@@ -542,30 +534,28 @@ function thinkNow() {
 
 /* ---------- shell ---------- */
 function renderText() {
-  document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
   document.title = `TripFix · ${routeName(SC)}`;
-  $('lang').textContent = lang === 'en' ? '中文' : 'English';
   renderTripPicker();
   $('restore-money').hidden = S.order.includes('money') || !SC.acts.length;
-  $('restore-money').textContent = L('＋ 少花钱', '+ Spend less');
+  $('restore-money').textContent = '+ Spend less';
   const running = S.waiting || S.n > 0;
   $('replay').className = running ? 'replay' : 'replay start-demo g';
-  $('replay').innerHTML = running ? icon('undo') + L('重新演示','Replay') : L('开始演示','Start demo');
-  $('h-rank').textContent = L('优先级块', 'Priority Block');
-  $('ax-hi').textContent = L('高', 'Hi');
-  $('ax-lo').textContent = L('低', 'Lo');
-  $('ax-name').textContent = L('优先级', 'PRIORITY');
-  $('add').innerHTML = icon('plus') + L('添加', 'Add');
+  $('replay').innerHTML = running ? icon('undo') + 'Replay' : 'Start demo';
+  $('h-rank').textContent = 'Priority Block';
+  $('ax-hi').textContent = 'Hi';
+  $('ax-lo').textContent = 'Lo';
+  $('ax-name').textContent = 'PRIORITY';
+  $('add').innerHTML = icon('plus') + 'Add';
   $('add').disabled = SC.acts.length >= MAX_ACTS;
-  $('add').title = SC.acts.length >= MAX_ACTS ? L(`最多 ${MAX_ACTS} 个安排`, `Up to ${MAX_ACTS} items`) : '';
+  $('add').title = SC.acts.length >= MAX_ACTS ? `Up to ${MAX_ACTS} items` : '';
   const lastEdit = S.hist[S.hist.length - 1];
   $('edit-undo').disabled = !lastEdit;
-  $('edit-undo').innerHTML = icon('undo') + (lastEdit?.deleted ? L('撤销删除', 'Undo delete') : L('撤销', 'Undo'));
-  $('h-think').textContent = L('偏好记忆', 'Preference Memory');
-  $('h-req').textContent = L('本次偏好', 'Current preferences');
-  $('h-mem').textContent = L('历史偏好', 'Past preferences');
-  $('h-book').textContent = L('待确认', 'Pending actions');
-  $('st1').innerHTML = S.guess && S.mem.order ? icon('spark') + L('参考过往排序', 'From past trips') : icon('person') + L('本次排序', 'Current order');
+  $('edit-undo').innerHTML = icon('undo') + (lastEdit?.deleted ? 'Undo delete' : 'Undo');
+  $('h-think').textContent = 'Preference Memory';
+  $('h-req').textContent = 'Current preferences';
+  $('h-mem').textContent = 'Past preferences';
+  $('h-book').textContent = 'Pending actions';
+  $('st1').innerHTML = S.guess && S.mem.order ? icon('spark') + 'From past trips' : icon('person') + 'Current order';
 }
 function beginDemo() {
   resetDemo();
@@ -641,8 +631,8 @@ function deleteAct(id) {
     $('edit-undo').focus({preventScroll: true});
     return;
   }
-  const nm = L(act(id).name);
-  editTrip(() => { SC.acts = SC.acts.filter(a => a.id !== id); }, L(`已删除「${nm}」`, `Deleted ${nm}`), true);
+  const nm = act(id).name;
+  editTrip(() => { SC.acts = SC.acts.filter(a => a.id !== id); }, `Deleted ${nm}`, true);
 }
 
 function applyProposal() {
@@ -691,13 +681,13 @@ function modeOf(a) {
 }
 function openAct(id) {
   if (id === 'money') {
-    $('money-name').textContent = L('少花钱', 'Spend less');
-    $('money-budget-label').textContent = L('改签最多补多少（£）', 'Maximum extra rebooking cost (£)');
+    $('money-name').textContent = 'Spend less';
+    $('money-budget-label').textContent = 'Maximum extra rebooking cost (£)';
     $('money-budget').value = S.mem.cap ? mem('cap')?.cap ?? 0 : 0;
-    $('money-save').textContent = L('保存', 'Save');
+    $('money-save').textContent = 'Save';
     $('money-close').innerHTML = icon('x');
-    $('money-close').setAttribute('aria-label', L('关闭', 'Close'));
-    $('money-delete').innerHTML = icon('trash') + L('删除', 'Delete');
+    $('money-close').setAttribute('aria-label', 'Close');
+    $('money-delete').innerHTML = icon('trash') + 'Delete';
     $('money-dialog').showModal();
     $('money-budget').focus(); $('money-budget').select();
     return;
@@ -712,27 +702,27 @@ function openAct(id) {
   }
   D = {id, icon: a ? a.icon : 'pin', flex: a ? modeOf(a) : 'move', kind: a ? a.kind : 'free', s0: s, e0: e, flex0: a ? modeOf(a) : null,
     color: a ? a.color : freeColor()};
-  $('d-h').textContent = a ? L('编辑安排', 'Edit item') : L('添加安排', 'Add an item');
+  $('d-h').textContent = a ? 'Edit item' : 'Add an item';
   $('d-sn').innerHTML = icon(a ? 'pencil' : 'plus');
   $('d-sn').style.setProperty('--c', D.color);
-  $('l-name').textContent = L('名称', 'Name');
-  $('l-place').textContent = L('地点（可选）', 'Place (optional)');
-  $('l-s').textContent = L('开始', 'Start');
-  $('l-e').textContent = L('结束', 'End');
-  $('l-flex').textContent = L('出意外时', 'If something goes wrong');
-  $('l-kind').textContent = L('类型', 'Type');
-  $('l-icon').textContent = L('图标', 'Icon');
-  $('d-name').value = a ? L(a.name) : '';
-  $('d-place').value = a && a.place ? L(a.place) : '';
+  $('l-name').textContent = 'Name';
+  $('l-place').textContent = 'Place (optional)';
+  $('l-s').textContent = 'Start';
+  $('l-e').textContent = 'End';
+  $('l-flex').textContent = 'If something goes wrong';
+  $('l-kind').textContent = 'Type';
+  $('l-icon').textContent = 'Icon';
+  $('d-name').value = a ? a.name : '';
+  $('d-place').value = a && a.place ? a.place : '';
   $('d-s').value = fmt(s); $('d-e').value = fmt(e);
-  seg($('d-flex'), [['fixed', L('时间不能动', 'Fixed time')], ['move', L('可以挪', 'Can move')], ['short', L('可挪可缩短', 'Move or shorten')]], D.flex, 'flex');
-  seg($('d-kind'), [['free', L('不用票', 'Free')], ['ticket', L('有票', 'Ticketed')], ['social', L('约了人', 'With someone')]], D.kind, 'kind');
+  seg($('d-flex'), [['fixed', 'Fixed time'], ['move', 'Can move'], ['short', 'Move or shorten']], D.flex, 'flex');
+  seg($('d-kind'), [['free', 'Free'], ['ticket', 'Ticketed'], ['social', 'With someone']], D.kind, 'kind');
   $('d-icon').innerHTML = ICONS.map(n => `<button type="button" data-i="${n}" aria-pressed="${n === D.icon}" aria-label="${n}">${icon(n)}</button>`).join('');
   $('d-icon').style.setProperty('--c', D.color);
   $('d-del').hidden = !a;
-  $('d-del').innerHTML = icon('trash') + L('删除', 'Delete');
-  $('d-save').innerHTML = icon('check') + (a ? L('保存', 'Save') : L('添加', 'Add'));
-  $('d-x').innerHTML = icon('x'); $('d-x').setAttribute('aria-label', L('关闭', 'Close'));
+  $('d-del').innerHTML = icon('trash') + 'Delete';
+  $('d-save').innerHTML = icon('check') + (a ? 'Save' : 'Add');
+  $('d-x').innerHTML = icon('x'); $('d-x').setAttribute('aria-label', 'Close');
   validate();
   $('dlg').showModal();
   setTimeout(() => $('d-name').focus(), 30);
@@ -744,14 +734,14 @@ function freeColor() {
 function validate() {
   const nm = $('d-name').value.trim(), s = toMin($('d-s').value), e = toMin($('d-e').value);
   let w = '';
-  if (!nm) w = L('起个名字', 'Give it a name');
-  else if (isNaN(s) || isNaN(e)) w = L('填好开始和结束时间', 'Set the start and end');
-  else if (e - s < 15) w = L('结束要比开始晚至少 15 分钟', 'End at least 15 min after start');
-  else if (s < arrival()) w = L(`到达后才能开始：${fmt(arrival())} 之后`, `Starts after you arrive: ${fmt(arrival())}`);
-  else if (e > SC.dayEnd) w = L(`要在 ${fmt(SC.dayEnd)} 前结束，才赶得上回程`, `Must end by ${fmt(SC.dayEnd)} to catch the return`);
+  if (!nm) w = 'Give it a name';
+  else if (isNaN(s) || isNaN(e)) w = 'Set the start and end';
+  else if (e - s < 15) w = 'End at least 15 min after start';
+  else if (s < arrival()) w = `Starts after you arrive: ${fmt(arrival())}`;
+  else if (e > SC.dayEnd) w = `Must end by ${fmt(SC.dayEnd)} to catch the return`;
   else {
     const hit = SC.acts.find(x => x.id !== D.id && s < x.plan.e + SC.gap && x.plan.s < e + SC.gap);
-    if (hit) w = L(`和「${L(hit.name)}」（${fmt(hit.plan.s)}–${fmt(hit.plan.e)}）时间挨得太近`, `Too close to ${L(hit.name)} (${fmt(hit.plan.s)}–${fmt(hit.plan.e)})`);
+    if (hit) w = `Too close to ${hit.name} (${fmt(hit.plan.s)}–${fmt(hit.plan.e)})`;
   }
   $('d-warn').textContent = w;
   $('d-save').disabled = !!w;
@@ -771,50 +761,50 @@ function saveAct() {
   editTrip(() => {
     let a = id ? act(id) : null;
     if (!a) { a = {id: 'u' + Date.now().toString(36), color: D.color}; SC.acts.push(a); }
-    if (!a.name || L(a.name) !== nm) a.name = {zh: nm, en: nm};
-    if (!a.place || L(a.place) !== pl) a.place = {zh: pl, en: pl};
+    if (!a.name || a.name !== nm) a.name = nm;
+    if (!a.place || a.place !== pl) a.place = pl;
     a.icon = D.icon; a.kind = D.kind;
-    if (a.kind === 'social' && !a.who) a.who = L('对方', 'them');
+    if (a.kind === 'social' && !a.who) a.who = 'them';
     if (!id || s !== D.s0 || e !== D.e0 || D.flex !== D.flex0) build(a);
     SC.view = [Math.min(SC.view[0], s - 30), Math.max(SC.view[1], e + 30)];
-  }, id ? L(`已更新「${nm}」`, `Updated ${nm}`) : L(`已添加「${nm}」`, `Added ${nm}`));
+  }, id ? `Updated ${nm}` : `Added ${nm}`);
   $('dlg').close();
 }
 
 /* ---------- trip details card ---------- */
 function openTrip() {
   const leg = SC.legs[0];
-  $('t-h').textContent = creating ? L('新建行程', 'New trip') : L('行程信息', 'Trip details');
-  $('l-budget').textContent = L('改签补款上限（£）', 'Extra rebooking budget (£)');
+  $('t-h').textContent = creating ? 'New trip' : 'Trip details';
+  $('l-budget').textContent = 'Extra rebooking budget (£)';
   $('t-budget').value = mem('cap')?.cap ?? '';
-  $('t-budget').placeholder = L('留空则只选免费方案', 'Blank for no extra cost');
-  $('t-from').placeholder = L('出发城市', 'Departure city');
-  $('t-to').placeholder = L('目的城市', 'Destination city');
-  $('l-from').textContent = L('出发地', 'From');
-  $('l-to').textContent = L('目的地', 'To');
-  $('l-date').textContent = L('日期', 'Date');
-  $('l-dep').textContent = L('去程出发', 'Depart');
-  $('l-arr').textContent = L('到达', 'Arrive');
-  $('l-ret').textContent = L('回程出发', 'Return');
-  $('t-from').value = L(SC.from); $('t-to').value = L(SC.to); $('t-date').value = L(SC.date);
+  $('t-budget').placeholder = 'Blank for no extra cost';
+  $('t-from').placeholder = 'Departure city';
+  $('t-to').placeholder = 'Destination city';
+  $('l-from').textContent = 'From';
+  $('l-to').textContent = 'To';
+  $('l-date').textContent = 'Date';
+  $('l-dep').textContent = 'Depart';
+  $('l-arr').textContent = 'Arrive';
+  $('l-ret').textContent = 'Return';
+  $('t-from').value = SC.from; $('t-to').value = SC.to; $('t-date').value = SC.date;
   $('t-dep').value = fmt(leg.dep); $('t-arr').value = fmt(leg.arr); $('t-ret').value = fmt(SC.home.t);
   $('t-x').innerHTML = icon('x');
-  $('t-x').setAttribute('aria-label', L('关闭', 'Close'));
-  $('t-clear').innerHTML = icon('trash') + L('清空所有安排', 'Clear all items');
+  $('t-x').setAttribute('aria-label', 'Close');
+  $('t-clear').innerHTML = icon('trash') + 'Clear all items';
   $('t-clear').hidden = !SC.acts.length;
-  $('t-save').innerHTML = icon('check') + L('保存', 'Save');
+  $('t-save').innerHTML = icon('check') + 'Save';
   vTrip(); $('tdlg').showModal();
 }
 function vTrip() {
   const dep = toMin($('t-dep').value), arr = toMin($('t-arr').value), ret = toMin($('t-ret').value);
   let w = '';
-  if (!$('t-from').value.trim() || !$('t-to').value.trim()) w = L('填写出发地和目的地', 'Enter the origin and destination');
-  else if (!$('t-budget').validity.valid) w = L('预算需为 0–10000 之间的金额', 'Enter a budget from 0 to 10000');
-  else if ([dep, arr, ret].some(isNaN)) w = L('填好三个时间', 'Fill in all three times');
-  else if (arr - dep < 10) w = L('到达要晚于出发', 'Arrival must be after departure');
-  else if (ret - arr < 90) w = L('回程至少要在到达 1.5 小时后', 'Return at least 1.5 h after arrival');
+  if (!$('t-from').value.trim() || !$('t-to').value.trim()) w = 'Enter the origin and destination';
+  else if (!$('t-budget').validity.valid) w = 'Enter a budget from 0 to 10000';
+  else if ([dep, arr, ret].some(isNaN)) w = 'Fill in all three times';
+  else if (arr - dep < 10) w = 'Arrival must be after departure';
+  else if (ret - arr < 90) w = 'Return at least 1.5 h after arrival';
   const out = !w ? SC.acts.filter(a => a.plan.s < arr + SC.lead || a.plan.e > ret - 20) : [];
-  $('t-warn').textContent = w || (out.length ? L(`有 ${out.length} 个安排超出时间范围`, `${out.length} item(s) outside the trip window`) : '');
+  $('t-warn').textContent = w || (out.length ? `${out.length} item(s) outside the trip window` : '');
   $('t-warn').classList.toggle('soft', !w && !!out.length);
   $('t-save').disabled = !!w;
   return !w;
@@ -826,7 +816,7 @@ function writeBudget(value, enable = false) {
   }
   const cap = Number(value);
   if (!old || old.cap !== cap) {
-    const note = {id:'cap', kind:'said', cap, text:{zh:`改签时，你最多愿意多付 £${cap}`, en:`You’ll pay up to £${cap} extra to rebook`}, src:{zh:'你在这趟行程中设定的预算',en:'Budget you set for this trip'}};
+    const note = {id:'cap', kind:'said', cap, text:`You’ll pay up to £${cap} extra to rebook`, src:'Budget you set for this trip'};
     if (old) Object.assign(old,note); else SC.memory.push(note);
     S.mem.cap = true;
   } else if (enable) S.mem.cap = true;
@@ -838,17 +828,16 @@ function saveTrip() {
   if (fresh) creating = null;
   editTrip(() => {
     writeBudget(v('t-budget'));
-    const two = (o, val) => (o && L(o) === val) ? o : {zh: val, en: val};
-    const fromChanged = L(SC.from) !== v('t-from'), toChanged = L(SC.to) !== v('t-to');
-    SC.from = two(SC.from, v('t-from')); SC.to = two(SC.to, v('t-to')); SC.date = two(SC.date, v('t-date'));
-    if (fresh) SC.title = {zh: SC.from.zh + ' → ' + SC.to.zh, en: SC.from.en + ' → ' + SC.to.en};
+    const fromChanged = SC.from !== v('t-from'), toChanged = SC.to !== v('t-to');
+    SC.from = v('t-from'); SC.to = v('t-to'); SC.date = v('t-date');
+    if (fresh) SC.title = (SC.from + ' → ' + SC.to);
     const leg = SC.legs[0];
     if (leg.dep !== dep || leg.arr !== arr || fromChanged || toChanged || SC.home.t !== ret) {
-      SC.legs = [Object.assign({}, leg, {dep, arr, a: fromChanged ? SC.from : leg.a, b: toChanged ? SC.to : leg.b, name: {zh: `去程 ${fmt(dep)}`, en: `Outbound ${fmt(dep)}`}})];
+      SC.legs = [Object.assign({}, leg, {dep, arr, a: fromChanged ? SC.from : leg.a, b: toChanged ? SC.to : leg.b, name: `Outbound ${fmt(dep)}`})];
       SC.home = {t: ret}; SC.dayEnd = ret - 20; SC.events = null;
       SC.view = [Math.min(dep, ...SC.acts.map(a => a.plan.s)) - 30, Math.max(ret, ...SC.acts.map(a => a.plan.e)) + 25];
     }
-  }, L('已更新行程信息', 'Trip details updated'));
+  }, 'Trip details updated');
   if (fresh) {S.hist.length = 0; render();}
   $('tdlg').close();
 }
@@ -857,17 +846,17 @@ function saveTrip() {
 function renderTripPicker() {
   const menu = $('trip-menu');
   const groups = [
-    [L('过往行程', 'Past trips'), SCENARIOS.filter(t => !t.blank).map(t => TRIPS[t.id])],
-    [L('已保存的行程', 'Saved trips'), Object.values(TRIPS).filter(t => t.id.startsWith('trip-') && t.id !== creating)]
+    ['Past trips', SCENARIOS.filter(t => !t.blank).map(t => TRIPS[t.id])],
+    ['Saved trips', Object.values(TRIPS).filter(t => t.id.startsWith('trip-') && t.id !== creating)]
   ];
   const options = groups.map(([label,trips]) => {
     const items = trips.map(t => {
       const current = t.id === SC.id;
-      const detail = L(t.date) || fmt(t.legs[0].dep);
+      const detail = t.date || fmt(t.legs[0].dep);
       return `<button type="button" data-trip="${esc(t.id)}" aria-current="${current}"><span><b>${esc(routeName(t))}</b><small>${esc(detail)}</small></span>${current ? icon('check') : ''}</button>`;
     }).join('');
     return items ? `<section><h2>${label}</h2>${items}</section>` : '';
-  }).join('') + `<button class="create-route" type="button" data-trip="new">${icon('plus')}${L('新建行程','New trip')}</button>`;
+  }).join('') + `<button class="create-route" type="button" data-trip="new">${icon('plus')}${'New trip'}</button>`;
   if (menu._options !== options) {menu.innerHTML = options; menu._options = options;}
 }
 function showTripMenu(open, focusTrigger = false) {
@@ -929,12 +918,6 @@ $('review-done').onclick = () => {
 };
 addEventListener('scroll', positionCue, {capture:true, passive:true});
 addEventListener('resize', positionCue);
-$('lang').onclick = () => { location.hash = lang === 'en' ? 'zh' : 'en'; };
-addEventListener('hashchange', () => {
-  const h = location.hash.slice(1); if (h !== 'zh' && h !== 'en') return;
-  lang = h; try { localStorage.setItem('tripfix-lang', lang); } catch (e) {}
-  $('mems').innerHTML = ''; $('rt').innerHTML = ''; render();
-});
 $('go').onclick = confirm;
 $('acts').onclick = e => {
   if (e.target.closest('[data-restore-options]')) {S.excluded={}; thinkNow(); return;}
@@ -1003,7 +986,7 @@ $('tform').addEventListener('submit', e => { e.preventDefault(); saveTrip(); });
 $('d-x').onclick = () => $('dlg').close();
 $('t-x').onclick = () => $('tdlg').close();
 $('d-del').onclick = () => { const id = D.id; $('dlg').close(); if (id) deleteAct(id); };
-$('t-clear').onclick = () => { $('tdlg').close(); editTrip(() => { SC.acts = []; }, L('已清空所有安排', 'All items cleared'), true); };
+$('t-clear').onclick = () => { $('tdlg').close(); editTrip(() => { SC.acts = []; }, 'All items cleared', true); };
 $('money-close').onclick = () => $('money-dialog').close();
 $('money-delete').onclick = () => { $('money-dialog').close(); deleteAct('money'); };
 ['dlg', 'tdlg', 'money-dialog'].forEach(id => $(id).addEventListener('click', e => { if (e.target === $(id)) $(id).close(); }));

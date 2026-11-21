@@ -34,8 +34,6 @@ ul,ol{list-style:none;margin:0;padding:0}
 .next small{font-size:13px;opacity:.8;font-variant-numeric:tabular-nums}
 .next.idle{animation:pulse 2.2s infinite}
 .next.done{--c:var(--ink)}
-.lang{height:36px;padding:0 10px;border-radius:8px;font-weight:700;font-size:14px}
-.lang:hover{background:var(--soft)}
 
 /* top: the live itinerary */
 .top{padding:16px var(--pad) 0}
@@ -313,7 +311,6 @@ body.dragging,body.dragging *{cursor:grabbing!important}
 .dfoot .go{margin-left:auto;height:46px}
 @keyframes dlgin{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}
 
-.hd .lang{margin-left:auto}
 .titlerow{align-items:center;flex-wrap:wrap;row-gap:8px}
 .trow{min-width:0;max-width:100%;flex-wrap:wrap}
 .route-picker{position:relative;max-width:100%}
@@ -417,7 +414,7 @@ body.dragging,body.dragging *{cursor:grabbing!important}
 @media(max-width:760px){
   .app{height:100dvh;display:block;overflow:auto}
   .hd{min-height:50px;gap:6px;padding-inline:12px;flex-wrap:wrap}
-  .logo{font-size:18px}.lang{font-size:12px;padding:5px}
+  .logo{font-size:18px}
   .top{padding-inline:15px}.titlerow{display:block}.top h1{font-size:27px}.notice-row{margin-top:8px;flex-wrap:wrap}.ev{max-width:100%;flex-wrap:wrap;gap:6px 10px;padding:7px 10px}
   .route-picker h1{font-size:20px}.route{min-width:560px}.route-scroll{overflow-x:auto}
   .flow{display:flex;flex-direction:column;gap:13px;padding:14px}

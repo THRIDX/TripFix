@@ -1,12 +1,12 @@
 # TripFix
 
-README prose word count: 539
+README prose word count: 535
 
 A cancelled train can leave three activities on the calendar and still cost a traveller the one they came for. TripFix lets the traveller choose what to protect, inspect the preferences behind a proposed repair and approve the changes.
 
 ## Start here · Current A2 demo
 
-[Download the project ZIP](https://github.com/THRIDX/TripFix/archive/refs/heads/main.zip), extract it, and open `TripFix/index.html` in your browser. Select **English**, then **Start demo**. The [project report (PDF)](TripFix/TripFix_A2_Project_Report.pdf) follows this version.
+[Download the project ZIP](https://github.com/THRIDX/TripFix/archive/refs/tags/a2-canvas-nov21.zip), extract it, and open `TripFix/index.html` in your browser. Select **Start demo**. The [project report (PDF)](TripFix/TripFix_A2_Project_Report.pdf) follows this version.
 
 To serve the same demo with Python 3, run this from the repository root:
 
@@ -14,7 +14,7 @@ To serve the same demo with Python 3, run this from the repository root:
 python -m http.server 8788 --bind 127.0.0.1 --directory TripFix
 ```
 
-Open the [English demo](http://127.0.0.1:8788/#en) and select **Start demo** on the Birmingham to London trip. No installation or API key is required if Python and a modern browser are available.
+Open the [demo](http://127.0.0.1:8788/) and select **Start demo** on the Birmingham to London trip. No installation or API key is required if Python and a modern browser are available.
 
 ## Replay the London decision
 
@@ -46,4 +46,4 @@ I defined the problem, project goal, London scenario and both core interaction d
 
 ## Project files
 
-Open the [English report (PDF)](TripFix/TripFix_A2_Project_Report.pdf) for the architecture and storyboards. The [browser source](TripFix/), [editable system diagram](evidence/tripfix-system-architecture.svg) and [A1 design concept](archive/a1/design-concept.md) are available separately.
+Open the [report (PDF)](TripFix/TripFix_A2_Project_Report.pdf) for the architecture and storyboards. The [browser source](TripFix/), [editable system diagram](evidence/tripfix-system-architecture.svg) and [A1 design concept](archive/a1/design-concept.md) are available separately.
